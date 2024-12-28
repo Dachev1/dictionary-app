@@ -1,4 +1,4 @@
-package com.dictionaryapp.controller.dto;
+package com.dictionaryapp.controller.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

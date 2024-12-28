@@ -1,6 +1,6 @@
 package com.dictionaryapp.validation;
 
-import com.dictionaryapp.controller.dto.UserRegisterDTO;
+import com.dictionaryapp.controller.dto.user.UserRegisterDTO;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

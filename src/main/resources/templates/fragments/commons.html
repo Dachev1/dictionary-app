@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -11,29 +10,52 @@
 </head>
 <body>
 <header>
-    <nav class="navbar navbar-expand-lg bg-nav rounded " >
-        <a class="nav-link my-text-color active h5 " href="/">Dictionary App</a>
-        <a class="nav-link my-text-color active h5  " href="/">Add Word</a>
+    <nav class="navbar navbar-expand-lg bg-nav rounded">
+        <a class="nav-link my-text-color active h5" th:href="@{/}">Dictionary App</a>
+
+        <!-- Add Word link for logged-in users -->
+        <a th:if="${@sessionUser != null and @sessionUser.loggedIn}"
+           class="nav-link my-text-color active h5"
+           th:href="@{/words/add}">Add Word</a>
 
         <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarNav">
             <ul class="navbar-nav row">
-                <li class="nav-item col-md-4">
-                    <a class="nav-link active h5 my-text-color" href="/">Login</a>
+
+                <!-- Login and Register links for guest users -->
+                <li class="nav-item col-md-4" th:if="${@sessionUser == null or !@sessionUser.loggedIn}">
+                    <a class="nav-link active h5 my-text-color" th:href="@{/users/login}">Login</a>
+                </li>
+                <li class="nav-item col-md-4" th:if="${@sessionUser == null or !@sessionUser.loggedIn}">
+                    <a class="nav-link my-text-color active h5" th:href="@{/users/register}">Register</a>
                 </li>
 
-                <li class="nav-item col-md-4">
-                    <a class="nav-link my-text-color active h5 " href="/">Register</a>
-                </li>
-
-                    <a class="nav-link h5 my-text-color">Welcome, {username}</a>
-                <li class="nav-item col-md-4">
-                    <a class="nav-link my-text-color active h5 " href="/">Logout</a>
+                <!-- Welcome message and Logout for logged-in users -->
+                <li class="nav-item col-md-6 d-flex align-items-center justify-content-end"
+                    th:if="${@sessionUser != null and @sessionUser.loggedIn}">
+                    <!-- Welcome Text -->
+                    <span class="nav-link h5 text-white fw-bold me-3">
+                        Welcome, <span th:text="${@sessionUser.username}"></span>
+                    </span>
+                    <!-- Logout Button -->
+                    <form th:action="@{/users/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-warning btn-sm px-3 py-1 fw-bold">
+                            Logout
+                        </button>
+                    </form>
                 </li>
             </ul>
         </div>
     </nav>
 </header>
-<footer class="footer bg-transparent  py-2">
+
+<main>
+    <div class="container text-center mt-5">
+        <h1>Welcome to the Dictionary App</h1>
+        <p>Explore and contribute to the best collection of words!</p>
+    </div>
+</main>
+
+<footer class="footer bg-transparent py-2">
     <div class="container-fluid text-center">
         <div class="footer-background h5 my-text-color">
             &copy; Spring team 2023. All rights reserved.

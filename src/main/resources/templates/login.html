@@ -5,34 +5,39 @@
 <body>
 <header th:replace="~{fragments/commons::nav}"></header>
 <main>
-    <h1 class="text-center mt-2"><span class="badge badge-pill badge-dark">Login</span></h1>
+    <h1 class="text-center mt-2">
+        <span class="badge badge-pill badge-dark">Login</span>
+    </h1>
     <hr class="hr-3 w-25 bg-white"/>
-    <form class="mx-auto w-25 bg-blur" action="/" method="" >
 
-        <!--    Example: Render errors messages with fields.errors - you can make it differently. -->
-        <!--    <div th:each="error: ${#fields.errors()}" th:text="${error}" class="text-danger">Error messages</div>-->
+    <!-- Login Form -->
+    <form class="mx-auto w-25 bg-blur mt-4 p-4 rounded border border-light" method="post" th:action="@{/users/login}" th:object="${login}">
+        <!-- Error Message Above Username Field -->
+        <div th:if="${errorMessage}" class="alert alert-danger text-center mb-3" role="alert">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
 
-        <div class="text-danger">Error messages</div>
-        <div class="text-danger">Incorrect username or password!</div>
-
+        <!-- Username Field -->
         <div class="form-group">
-            <div class="label-holder text-white d-flex justify-content-center">
-                <label for="username" class="h3 mb-2">Username</label>
-            </div>
-            <input type="text" class="form-control" id="username" name="username"/>
+            <label for="username" class="h3 mb-2 text-white">Username</label>
+            <input th:field="*{username}" th:errorclass="'is-invalid'" type="text" class="form-control"
+                   id="username" name="username" placeholder="Enter your username"/>
+            <small class="invalid-feedback text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></small>
         </div>
 
+        <!-- Password Field -->
         <div class="form-group">
-            <div class="label-holder text-white d-flex justify-content-center">
-                <label for="password" class="h3 mb-2">Password</label>
-            </div>
-            <input type="password" class="form-control" id="password" name="password"/>
+            <label for="password" class="h3 mb-2 text-white">Password</label>
+            <input th:field="*{password}" th:errorclass="'is-invalid'" type="password" class="form-control"
+                   id="password" name="password" placeholder="Enter your password"/>
+            <small class="invalid-feedback text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
         </div>
 
-        <div class="button-holder d-flex justify-content-center">
-            <button type="submit" class="btn btn-warning  mb-3">Login</button>
+        <!-- Submit Button -->
+        <div class="button-holder d-flex justify-content-center mt-3">
+            <button type="submit" class="btn btn-warning btn-lg">Login</button>
         </div>
-
     </form>
 </main>
 <footer th:replace="~{fragments/commons::footer}"></footer>

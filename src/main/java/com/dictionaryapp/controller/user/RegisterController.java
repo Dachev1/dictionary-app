@@ -1,7 +1,8 @@
 package com.dictionaryapp.controller.user;
 
-import com.dictionaryapp.controller.dto.UserRegisterDTO;
+import com.dictionaryapp.controller.dto.user.UserRegisterDTO;
 import com.dictionaryapp.service.UserService;
+import com.dictionaryapp.session.SessionUser;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,13 +18,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class RegisterController {
 
     private final UserService userService;
+    private final SessionUser sessionUser;
 
-    public RegisterController(UserService userService) {
+    public RegisterController(UserService userService, SessionUser sessionUser) {
         this.userService = userService;
+        this.sessionUser = sessionUser;
     }
 
     @GetMapping("/register")
     public String register(Model model) {
+        if (sessionUser.isLoggedIn()) {
+            return "redirect:/home";
+        }
         if (!model.containsAttribute("user")) {
             model.addAttribute("user", new UserRegisterDTO());
         }
@@ -34,14 +40,12 @@ public class RegisterController {
     public String doRegister(
             @Valid @ModelAttribute("user") UserRegisterDTO userRegisterDTO,
             BindingResult bindingResult,
-            RedirectAttributes redirectAttributes
-    ) {
-        // Check if the username is already taken
+            RedirectAttributes redirectAttributes) {
+
         if (userService.isUsernameTaken(userRegisterDTO.getUsername())) {
             bindingResult.rejectValue("username", "error.user", "Username is already taken");
         }
 
-        // Check if passwords do not match
         if (!userRegisterDTO.getPassword().equals(userRegisterDTO.getConfirmPassword())) {
             bindingResult.rejectValue("confirmPassword", "error.user", "Passwords do not match");
         }
@@ -53,7 +57,6 @@ public class RegisterController {
         }
 
         userService.register(userRegisterDTO);
-
         redirectAttributes.addFlashAttribute("successMessage", "Registration successful! Please log in.");
         return "redirect:/users/login";
     }

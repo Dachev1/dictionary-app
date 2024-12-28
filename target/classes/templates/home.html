@@ -1,70 +1,68 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/commons::head}"></head>
 <body>
 <header th:replace="~{fragments/commons::nav}"></header>
 <main>
-
     <div class="container bg-blur rounded mt-3 mb-4">
-        <h1>All words</h1>
-        <div class="row mt-3 mb-3">
+        <h1 class="text-center text-white mt-4">All Words</h1>
+        <hr class="bg-light"/>
 
-            <div class="col-5 bg-dark rounded m-auto" style="height: 30vh; overflow: auto">
-                <h3 class="mySticky bg-gray text-dark rounded">German: {germanWordsCount}</h3>
-                    <div class="mt-3 rounded badge-warning">
-                        <img class="mr-2" src="/img/german.png" alt="Flag" width="20px" height="20px">
-                        <span>{germanTerm}: {translation}</span>
-                        <br>
-                        <span>Example: {example}</span>
-                        <br>
-                        <span>Added by: {username} on {inputDate}</span>
-                        <a class="ml-3 text-danger" href="/">Remove</a>
-                    </div>
-            </div>
-
-            <div class="col-5 bg-dark rounded m-auto" style="height: 30vh; overflow: auto">
-                <h3 class="mySticky bg-gray text-dark rounded">Spanish: {spanishWordsCount}</h3>
-                    <div class="mt-3 rounded badge-secondary">
-                        <img class="mr-2" src="/img/spanish.png" alt="Flag" width="20px" height="20px">
-                        <span>{spanishTerm}: {translation}</span>
-                        <br>
-                        <span>Example: {example}</span>
-                        <br>
-                        <span>Added by: {username} on {inputDate}</span>
-                        <a class="ml-3 text-danger" href="/">Remove</a>
-                    </div>
-            </div>
+        <!-- Flash Messages -->
+        <div th:if="${successMessage}" class="alert alert-success text-center" role="alert">
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger text-center" role="alert">
+            <span th:text="${errorMessage}"></span>
         </div>
 
         <div class="row mt-3 mb-3">
-            <div class="col-5 bg-dark rounded m-auto" style="height: 30vh; overflow: auto">
-                <h3 class="mySticky bg-gray text-dark rounded">French: {frenchWordsCount}</h3>
-                    <div class="mt-3 rounded badge-info">
-                        <img class="mr-2" src="/img/french.png" alt="Flag" width="20px" height="20px">
-                        <span>{frenchTerm}: {translation}</span>
-                        <br>
-                        <span>Example: {example}</span>
-                        <br>
-                        <span>Added by: {username} on {inputDate}</span>
-                        <a class="ml-3 text-danger" href="/">Remove</a>
-                    </div>
-            </div>
+            <!-- Loop through each language section -->
+            <div th:each="entry : ${wordsByLanguage}" class="col-md-5 col-lg-5 bg-dark rounded mx-auto my-3"
+                 style="height: 30vh; overflow-y: auto; padding: 15px;">
+                <h3 class="text-center bg-gray text-dark py-2 rounded"
+                    th:text="${entry.key + ' (' + entry.value.size() + ')'}"></h3>
 
-            <div class="col-5 bg-dark rounded m-auto" style="height: 30vh; overflow: auto">
-                <h3 class="mySticky bg-gray text-dark rounded">Italian: {italianWordsCount}</h3>
-                    <div class="mt-3 rounded badge-success">
-                        <img class="mr-2" src="/img/italian.png" alt="Flag" width="20px" height="20px">
-                        <span>{italianTerm}: {translation}</span>
-                        <br>
-                        <span>Example: {example}</span>
-                        <br>
-                        <span>Added by: {username} on {inputDate}</span>
-                        <a class="ml-3 text-danger" href="/">Remove</a>
+                <!-- Loop through each word in the current language -->
+                <div th:each="word : ${entry.value}" class="word-item mt-3 p-2 rounded"
+                     th:classappend="${entry.key.toLowerCase() == 'german' ? 'badge-warning' :
+                                      entry.key.toLowerCase() == 'spanish' ? 'badge-secondary' :
+                                      entry.key.toLowerCase() == 'french' ? 'badge-info' :
+                                      entry.key.toLowerCase() == 'italian' ? 'badge-success' : 'badge-light'}">
+                    <div class="d-flex align-items-center">
+                        <!-- Image Path -->
+                        <img class="mr-2" th:src="@{'/img/' + entry.key.toLowerCase() + '.png'}" alt="Flag" width="20px" height="20px">
+                        <!-- Term and Translation -->
+                        <span th:text="${word.term + ': ' + word.translation}" class="font-weight-bold"></span>
                     </div>
+                    <!-- Example -->
+                    <p class="mb-1 mt-2" th:text="'Example: ' + ${word.example ?: 'N/A'}"></p>
+                    <!-- Username and Date -->
+                    <p class="mb-1">
+                        <small th:text="'Added by: ' + ${word.username ?: 'Unknown'} + ' on ' + ${word.inputDate ?: 'N/A'}"></small>
+                    </p>
+                    <!-- Remove Button -->
+                    <form th:action="@{/words/remove/{id}(id=${word.id})}" method="post" class="d-inline">
+                        <input type="hidden" name="_method" value="delete"/>
+                        <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Are you sure you want to remove this word?');">
+                            Remove
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
-        <a href="/home/remove-all" class="btn btn-danger">Remove all {allWordsCount} words</a>
+
+        <!-- Remove All Words Button -->
+        <div class="text-center mt-4">
+            <form th:action="@{/words/remove-all}" method="post">
+                <input type="hidden" name="_method" value="delete"/>
+                <button type="submit" class="btn btn-danger btn-lg"
+                        onclick="return confirm('Are you sure you want to remove all words?');"
+                        th:text="'Remove all ' + ${totalWordCount} + ' words'">
+                </button>
+            </form>
+        </div>
     </div>
 </main>
 <footer th:replace="~{fragments/commons::footer}"></footer>
